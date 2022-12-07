@@ -7,6 +7,7 @@ export const Banner = (props) => {
       <span className={styles.title2}>Shop</span>
     </h1>
     <p className={styles.subTitle}>Discovery your local coffee shops !</p>
+    <div className={styles.buttonWrapper}></div>
     <button className={styles.button} onClick={props.handleOnClick}>{props.buttonText}</button>
   </div>
 }
