@@ -1,11 +1,12 @@
 import Head from 'next/head'
-import Image from 'next/image'
+import Image from 'next/Image'
 import { Banner } from '../components/banner'
 import Card from '../components/card'
 import styles from '../styles/Home.module.css'
+import coffeeDatas from '../data/coffee-stores.json'
 
 export default function Home() {
-
+  console.log("nextjs");
   const handleClickBanner = () => {
     console.log("Click banner")
   }
@@ -24,9 +25,15 @@ export default function Home() {
           <Image src="/static/hero-image.png" width={700} height={400}/>
         </div>
         <div className={styles.cardLayout}>
-        <Card name={'DarkHouse Coffee'} imageURL="/static/hero-image.png" href="/coffee-store/darkhouse-coffee" className={styles.card}/>
-        <Card name={'DarkHouse Coffee'} imageURL="/static/hero-image.png" href="/coffee-store/darkhouse-coffee" className={styles.card}/>
-        <Card name={'DarkHouse Coffee'} imageURL="/static/hero-image.png" href="/coffee-store/darkhouse-coffee" className={styles.card}/>
+          {coffeeDatas.map((coffeeData) => {
+            return (
+              <Card 
+                key={coffeeData.id}
+                name={coffeeData.name}
+                imageURL={coffeeData.imgUrl}
+                href={`/coffee-store/${coffeeData.id}`}
+              />
+          )})}
         </div>
       </main>
     </div>
