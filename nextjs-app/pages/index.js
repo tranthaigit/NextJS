@@ -5,8 +5,16 @@ import Card from '../components/card'
 import styles from '../styles/Home.module.css'
 import coffeeDatas from '../data/coffee-stores.json'
 
-export default function Home() {
-  console.log("nextjs");
+export async function getStaticProps(context) {
+  return {
+    props: {
+      coffeeDatas
+    } // will be passed to the page component as props
+  }
+}
+
+export default function Home(props) {
+  console.log("props",props)
   const handleClickBanner = () => {
     console.log("Click banner")
   }
@@ -22,19 +30,24 @@ export default function Home() {
         <h1 className={styles.title}>Coffee Shop </h1>
         <Banner buttonText="View coffee nearby" handleOnClick={handleClickBanner}/>
         <div className={styles.heroImage}>
-          <Image src="/static/hero-image.png" width={700} height={400}/>
+          <Image alt="banner image" src="/static/hero-image.png" width={700} height={400}/>
         </div>
-        <div className={styles.cardLayout}>
-          {coffeeDatas.map((coffeeData) => {
-            return (
-              <Card 
-                key={coffeeData.id}
-                name={coffeeData.name}
-                imageURL={coffeeData.imgUrl}
-                href={`/coffee-store/${coffeeData.id}`}
-              />
-          )})}
-        </div>
+        { coffeeDatas.length > 0 && 
+        <>
+          <h2 className={styles.heading2}>Viet Nam</h2>
+          <div className={styles.cardLayout}>
+            {props.coffeeDatas.map((coffeeData) => {
+              return (
+                <Card
+                  key={coffeeData.id}
+                  name={coffeeData.name}
+                  imageURL={coffeeData.imgUrl}
+                  href={`/coffee-store/${coffeeData.id}`}
+                />
+            )})}
+          </div> 
+        </>
+        }
       </main>
     </div>
   )
