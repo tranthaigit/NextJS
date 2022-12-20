@@ -14,7 +14,6 @@ export async function getStaticProps(context) {
 }
 
 export default function Home(props) {
-  console.log("props",props)
   const handleClickBanner = () => {
     console.log("Click banner")
   }
