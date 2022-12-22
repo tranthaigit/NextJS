@@ -4,11 +4,13 @@ import { Banner } from '../components/banner'
 import Card from '../components/card'
 import styles from '../styles/Home.module.css'
 import coffeeDatas from '../data/coffee-stores.json'
+import { fetchCoffeeStores } from '../lib/coffee-store'
 
-export async function getStaticProps(context) {
+export async function getStaticProps() {  
+  const coffeeStore = await fetchCoffeeStores();
   return {
     props: {
-      coffeeDatas
+      coffeeDatas : coffeeStore
     } // will be passed to the page component as props
   }
 }
@@ -38,10 +40,10 @@ export default function Home(props) {
             {props.coffeeDatas.map((coffeeData) => {
               return (
                 <Card
-                  key={coffeeData.id}
+                  key={coffeeData.fsq_id}
                   name={coffeeData.name}
-                  imageURL={coffeeData.imgUrl}
-                  href={`/coffee-store/${coffeeData.id}`}
+                  imageURL={coffeeData.imgUrl || coffeeDatas[0].imgUrl}
+                  href={`/coffee-store/${coffeeData.fsq_id}`}
                 />
             )})}
           </div> 

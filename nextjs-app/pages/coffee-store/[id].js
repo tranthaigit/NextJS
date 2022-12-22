@@ -1,30 +1,34 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
-import coffeeDatas from "../../data/coffee-stores.json"
+import coffeeStoresDefault from "../../data/coffee-stores.json"
 import Head from "next/head";
 import style from "../../styles/coffee-store.module.css"
 import Image from 'next/Image'
 import cls from "classnames"
+import { fetchCoffeeStores } from "../../lib/coffee-store";
 
-export function getStaticProps(staticProps) {
-  const params = staticProps.params
+export async function getStaticProps(staticProps) {
+  const params = staticProps.params;
+
+  const coffeeStores = await fetchCoffeeStores();
   return {
     props: {
-      coffeeDatas: coffeeDatas.find((coffeeData) => {
-        return coffeeData.id.toString() === params.id // dynamic id
-      })
-    }
-  }
+      coffeeStore: coffeeStores.find((coffeeStore) => {
+        return coffeeStore.fsq_id.toString() === params.id; //dynamic id
+      }),
+    },
+  };
 }
 
-export function getStaticPaths() {
-  const paths = coffeeDatas.map((coffeeData) => {
+export async function getStaticPaths() {
+  const coffeeStores = await fetchCoffeeStores();
+  const paths = coffeeStores.map((coffeeStore) => {
     return {
       params: {
-        id: coffeeData.id.toString()
-      }
-    }
-  })
+        id: coffeeStore.fsq_id.toString(),
+      },
+    };
+  });
 
   return {
     paths,
@@ -34,7 +38,7 @@ export function getStaticPaths() {
 
 const CoffeeStore = (props) => {
   const router = useRouter();
-  const { address, name, neighbourhood, imgUrl } = props.coffeeDatas
+  const { location , name , imgURL } = props.coffeeStore
 
   if (router.isFallback) {
     return <div>Loading ...</div>
@@ -59,16 +63,22 @@ const CoffeeStore = (props) => {
           <div className={style.nameWrapper}>
             <h1 className={style.name}>{name}</h1>
           </div>
-          <Image src={imgUrl} width={600} height={360} className={style.storeImg} alt={name} />
+          <Image 
+            src={imgURL || coffeeStoresDefault[0].imgUrl}             
+            width={600}
+            height={360} 
+            className={style.storeImg} 
+            alt={name} 
+          />
         </div>
         <div className={cls("glass", style.col2)}>
           <div className={style.iconWrapper}>
             <Image src="/static/icons/places.svg" width="24" height="24" />
-            <p className={style.text}>{address}</p>
+            <p className={style.text}>{location.country}</p>
           </div>
           <div className={style.iconWrapper}>
             <Image src="/static/icons/nearMe.svg" width="24" height="24" />
-            <p className={style.text}>{neighbourhood}</p>
+            <p className={style.text}>{location.neighborhood}</p>
           </div>
           <div className={style.iconWrapper}>
             <Image src="/static/icons/star.svg" width="24" height="24" />
