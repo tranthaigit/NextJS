@@ -40,10 +40,10 @@ export default function Home(props) {
             {props.coffeeDatas.map((coffeeData) => {
               return (
                 <Card
-                  key={coffeeData.fsq_id}
+                  key={coffeeData.id}
                   name={coffeeData.name}
                   imageURL={coffeeData.imgUrl || coffeeDatas[0].imgUrl}
-                  href={`/coffee-store/${coffeeData.fsq_id}`}
+                  href={`/coffee-store/${coffeeData.id}`}
                 />
             )})}
           </div> 
