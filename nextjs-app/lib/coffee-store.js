@@ -1,7 +1,7 @@
 import { createApi } from "unsplash-js";
 
 const unsplash = createApi({
-  accessKey: process.env.UNSPLASH_ACCESS_KEY,
+  accessKey: process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY,
 })
 
 const getUrlForCoffeeStores = (latLong, query, limit) => {
@@ -12,30 +12,29 @@ const getListOfCoffeeStorePhotos = async () => {
   const photos = await unsplash.search.getPhotos({
     query: "coffee shop",
     page: 1,
-    perPage: 10,
+    perPage: 30,
   });
 
   const unsplashResults = photos.response.results;
-  console.log("photos",unsplashResults.map(result => result.urls["small"]));
   return unsplashResults.map(result => result.urls["small"]);
 }
 
-export const fetchCoffeeStores = async () => {
+export const fetchCoffeeStores = async (latLong = "10.80219243158919,106.71524045509209" , limit = 10) => {
   const photos = await getListOfCoffeeStorePhotos();
 
   const options = {
     method: "GET",
     headers: {
       Accept: "application/json",
-      Authorization: process.env.FOURSQUARE_API_KEY,
+      Authorization: process.env.NEXT_PUBLIC_FOURSQUARE_API_KEY,
     },
   };
 
   const response = await fetch(
     getUrlForCoffeeStores(
-      "43.653833032607096%2C-79.37896808855945",
+      latLong,
       "coffee",
-      6
+      limit
     ),
     options
   );
@@ -45,7 +44,7 @@ export const fetchCoffeeStores = async () => {
     const neighborhood = result.location.neighborhood;
     return {
       id: result.fsq_id,
-      address: result.location.address,
+      address: result.location.address === undefined ? 'Unable to locate' : result.location.address,
       name: result.name,
       neighborhood: neighborhood?.length > 0 ? neighborhood[0] : "",
       imgUrl: photos[index]

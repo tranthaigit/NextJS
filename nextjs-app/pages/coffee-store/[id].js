@@ -6,16 +6,18 @@ import style from "../../styles/coffee-store.module.css"
 import Image from 'next/Image'
 import cls from "classnames"
 import { fetchCoffeeStores } from "../../lib/coffee-store";
+import { useContext } from "react";
+import { StoreContext } from '../_app'
 
 export async function getStaticProps(staticProps) {
   const params = staticProps.params;
-
   const coffeeStores = await fetchCoffeeStores();
+  const findCoffeeStoreById = coffeeStores.find((coffeeStore) => {
+    return coffeeStore.id.toString() === params.id;
+  });
   return {
     props: {
-      coffeeStore: coffeeStores.find((coffeeStore) => {
-        return coffeeStore.id.toString() === params.id;
-      }),
+      coffeeStore: findCoffeeStoreById ? findCoffeeStoreById : {}
     },
   };
 }
@@ -44,6 +46,10 @@ const CoffeeStore = (props) => {
     return <div>Loading ...</div>
   }
 
+  const id = router.query.id;
+
+  const { state: coffeeStores} = useContext(StoreContext);
+
   const handleUpvoteButton = () => {}
 
   return (
@@ -70,7 +76,7 @@ const CoffeeStore = (props) => {
           />
         </div>
         <div className={cls("glass", style.col2)}>
-          {address && (<div className={style.iconWrapper}>
+          {address === undefined ? 1 : address && (<div className={style.iconWrapper}>
             <Image src="/static/icons/places.svg" width="24" height="24" />
             <p className={style.text}>{address}</p>
           </div>)}
