@@ -6,7 +6,7 @@ import styles from '../styles/Home.module.css'
 import { fetchCoffeeStores } from '../lib/coffee-store'
 import useTrackLocation from '../hooks/use-track-location'
 import { useContext, useEffect } from 'react'
-import { ACTION_TYPES, StoreContext } from './_app'
+import { ACTION_TYPES, StoreContext } from '../store/store-context'
 
 export async function getStaticProps() {  
   const coffeeStore = await fetchCoffeeStores();
@@ -26,13 +26,12 @@ export default function Home(props) {
     async function setCoffeeStoresByLocation() {
       if (latLong) {
         try {
-          const limit = 30
-          const fetchedCoffeeStores = await fetchCoffeeStores(latLong, limit);
-          console.log("fetchedCoffeeStores",fetchedCoffeeStores);
+          const response = await fetch(`/api/getCoffeeStoreByLocation?latLong=${latLong}&limit=30`);
+          const coffeeStores = await response.json();
           dispatch({
             type: ACTION_TYPES.SET_COFFEE_STORES,
             payload: {
-              coffeeStores: fetchedCoffeeStores
+              coffeeStores
             }
           })} catch (error) {
             console.log("Error", { error });
@@ -63,7 +62,7 @@ export default function Home(props) {
         <div className={styles.sectionWrapper}>
         { props.coffeeStore.length > 0 && 
         <>
-          <h2 className={styles.heading2}>Viet Nam</h2>
+          <h2 className={styles.heading2}>Stores near me</h2>
           <div className={styles.cardLayout}>
             {props.coffeeStore.map((coffeeData) => {
               return (

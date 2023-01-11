@@ -6,18 +6,19 @@ import style from "../../styles/coffee-store.module.css"
 import Image from 'next/Image'
 import cls from "classnames"
 import { fetchCoffeeStores } from "../../lib/coffee-store";
-import { useContext } from "react";
-import { StoreContext } from '../_app'
+import { useContext, useEffect, useState } from "react";
+import { isEmpty } from "../../utils/index";
+import { StoreContext } from "../../store/store-context"
 
 export async function getStaticProps(staticProps) {
   const params = staticProps.params;
   const coffeeStores = await fetchCoffeeStores();
   const findCoffeeStoreById = coffeeStores.find((coffeeStore) => {
-    return coffeeStore.id.toString() === params.id;
+    return coffeeStore.id.toString() === params.id; //dynamic id
   });
   return {
     props: {
-      coffeeStore: findCoffeeStoreById ? findCoffeeStoreById : {}
+      coffeeStore: findCoffeeStoreById ? findCoffeeStoreById : {},
     },
   };
 }
@@ -38,9 +39,8 @@ export async function getStaticPaths() {
   }
 }
 
-const CoffeeStore = (props) => {
+const CoffeeStore = (initialProps) => {
   const router = useRouter();
-  const { name, address, neighbourhood, imgUrl } = props.coffeeStore;
 
   if (router.isFallback) {
     return <div>Loading ...</div>
@@ -48,9 +48,26 @@ const CoffeeStore = (props) => {
 
   const id = router.query.id;
 
-  const { state: coffeeStores} = useContext(StoreContext);
+  const [coffeeStore, setCoffeeStore] = useState(initialProps.coffeeStore);
 
-  const handleUpvoteButton = () => {}
+  const {
+    state: { coffeeStores },
+  } = useContext(StoreContext);
+
+  useEffect(() => {
+    if (isEmpty(initialProps.coffeeStore)) {
+      if (coffeeStores.length > 0) {
+        const findCoffeeStoreById = coffeeStores.find((coffeeStore) => {
+          return coffeeStore.id.toString() === id; //dynamic id
+        });
+        setCoffeeStore(findCoffeeStoreById);
+      }
+    }
+  }, [id]);
+
+  const {name = "",address = "",neighbourhood = "",imgUrl = "",} = coffeeStore;
+
+  const handleUpvoteButton = () => { }
 
   return (
     <div className={style.layout}>
@@ -61,22 +78,22 @@ const CoffeeStore = (props) => {
         <div className={style.col1}>
           <div className={style.backToHomeLink}>
             <Link href="/">
-            ← Back to home
+              ← Back to home
             </Link>
           </div>
           <div className={style.nameWrapper}>
             <h1 className={style.name}>{name}</h1>
           </div>
-          <Image 
-            src={imgUrl || coffeeStoresDefault[0].imgUrl}             
+          <Image
+            src={imgUrl || coffeeStoresDefault[0].imgUrl}
             width={600}
-            height={360} 
-            className={style.storeImg} 
-            alt={name} 
+            height={360}
+            className={style.storeImg}
+            alt={name}
           />
         </div>
         <div className={cls("glass", style.col2)}>
-          {address === undefined ? 1 : address && (<div className={style.iconWrapper}>
+          {address && (<div className={style.iconWrapper}>
             <Image src="/static/icons/places.svg" width="24" height="24" />
             <p className={style.text}>{address}</p>
           </div>)}
